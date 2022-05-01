@@ -5,7 +5,7 @@
 _realname=emacs
 pkgbase="mingw-w64-${_realname}-native-compilation"
 pkgname="${MINGW_PACKAGE_PREFIX}-${_realname}-native-compilation"
-pkgver=28.0.90
+pkgver=28.1
 pkgrel=1
 pkgdesc="GNU Emacs native-compilation branch (mingw-w64)"
 url="https://www.gnu.org/software/${_realname}/"
@@ -45,7 +45,7 @@ conflicts=("${MINGW_PACKAGE_PREFIX}-emacs")
 # Don't zip info files because the built-in info reader uses gzip to
 # decompress them. gzip is not available as a mingw binary.
 options=('strip' '!zipman')
-source=("emacs-git::git://git.savannah.gnu.org/emacs.git#branch=emacs-28")
+source=("emacs-git::git://git.savannah.gnu.org/emacs.git#tag=emacs-28.1")
 # If Savannah access is blocked for reasons, you can use Github instead.
 #source=("emacs-git::git://github.com/emacs-mirror/emacs.git#branch=master")
 sha256sums=('SKIP')
