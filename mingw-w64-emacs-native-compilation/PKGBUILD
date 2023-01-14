@@ -5,7 +5,7 @@
 _realname=emacs
 pkgbase="mingw-w64-${_realname}-native-compilation"
 pkgname="${MINGW_PACKAGE_PREFIX}-${_realname}-native-compilation"
-pkgver=28.1
+pkgver=29.1
 pkgrel=1
 pkgdesc="GNU Emacs native-compilation branch (mingw-w64)"
 url="https://www.gnu.org/software/${_realname}/"
@@ -24,6 +24,7 @@ depends=("${MINGW_PACKAGE_PREFIX}-universal-ctags-git"
          "${MINGW_PACKAGE_PREFIX}-libgccjit")
 optdepends=("${MINGW_PACKAGE_PREFIX}-giflib"
             "${MINGW_PACKAGE_PREFIX}-libjpeg-turbo"
+            "${MINGW_PACKAGE_PREFIX}-diffutils" # used by magit for diffing
             "${MINGW_PACKAGE_PREFIX}-libpng"
             "${MINGW_PACKAGE_PREFIX}-librsvg"
             "${MINGW_PACKAGE_PREFIX}-libtiff"
@@ -45,7 +46,7 @@ conflicts=("${MINGW_PACKAGE_PREFIX}-emacs")
 # Don't zip info files because the built-in info reader uses gzip to
 # decompress them. gzip is not available as a mingw binary.
 options=('strip' '!zipman')
-source=("emacs-git::git://git.savannah.gnu.org/emacs.git#tag=emacs-28.1")
+source=("emacs-git::git://git.savannah.gnu.org/emacs.git#branch=emacs-29")
 # If Savannah access is blocked for reasons, you can use Github instead.
 #source=("emacs-git::git://github.com/emacs-mirror/emacs.git#branch=master")
 sha256sums=('SKIP')
@@ -66,7 +67,12 @@ build() {
     --with-modules \
     --without-dbus \
     --with-native-compilation \
-    --without-compress-install
+    --without-compress-install \
+    --with-native-compilation=aot \
+    --with-json \
+    --with-imagemagick \
+    --with-tree-sitter \
+    --with-w32
 
   # --without-compress-install is needed because we don't have gzip in
   # the mingw binaries.
@@ -76,7 +82,7 @@ build() {
   # when GNU mailutils become available for MINGW64 and MINGW32. Then 
   # mailutils should be included in the depends list.
 
-  make --jobs=1
+  make --jobs=24
   
   # Limiting the number of jobs to one fixed strange issues with GitHub CI 
   # (aka workflows). When using an unlimited number of jobs GitHub CI
