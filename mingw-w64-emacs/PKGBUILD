@@ -5,8 +5,8 @@ _enable_jit=$([[ "${MINGW_PREFIX}" =~ /clang.* ]] || echo yes)
 _realname=emacs
 pkgbase=mingw-w64-${_realname}
 pkgname="${MINGW_PACKAGE_PREFIX}-${_realname}"
-pkgver=28.2
-pkgrel=3
+pkgver=29.0
+pkgrel=1
 pkgdesc="The extensible, customizable, self-documenting, real-time display editor (mingw-w64)"
 url="https://www.gnu.org/software/${_realname}/"
 license=('spdx:GPL-3.0')
@@ -41,12 +41,11 @@ makedepends=("${MINGW_PACKAGE_PREFIX}-cc"
 # Don't zip info files because the built-in info reader uses gzip to
 # decompress them. gzip is not available as a mingw binary.
 options=('strip' '!zipman')
-source=("https://ftp.gnu.org/gnu/${_realname}/${_realname}-${pkgver}.tar.xz"{,.sig}
+source=("${_realname}-${pkgver}::git://git.savannah.gnu.org/emacs.git#branch=emacs-29"
         "001-ucrt.patch"
         "002-clang-fixes.patch")
 # source=("https://alpha.gnu.org/gnu/${_realname}/pretest/${_realname}-${pkgver}.tar.xz"{,.sig})
-sha256sums=('ee21182233ef3232dc97b486af2d86e14042dbb65bbc535df562c3a858232488'
-            'SKIP'
+sha256sums=('SKIP'
             'e1347064ec30094e21679764f784fa7557738946485359041473e6e9d7f3c3dc'
             '0543a3082262077edb89f2ee1af2531025888be7d15c8255d6c67fb732711781')
 # validpgpkeys=('28D3BED851FDF3AB57FEF93C233587A47C207910'
