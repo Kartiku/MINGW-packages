@@ -12,7 +12,7 @@ conflicts=("${MINGW_PACKAGE_PREFIX}-python3-cx_Freeze"
            "${MINGW_PACKAGE_PREFIX}-python-cx_Freeze")
 replaces=("${MINGW_PACKAGE_PREFIX}-python3-cx_Freeze"
           "${MINGW_PACKAGE_PREFIX}-python-cx_Freeze")
-pkgver=6.8.1
+pkgver=6.14.1
 pkgrel=1
 pkgdesc="Creates standalone executables from Python scripts, with the same performance (mingw-w64)"
 arch=('any')
@@ -20,12 +20,15 @@ mingw_arch=('mingw32' 'mingw64' 'ucrt64' 'clang64' 'clang32')
 license=('PSF')
 url="https://github.com/marcelotduarte/cx_Freeze/"
 depends=("${MINGW_PACKAGE_PREFIX}-python"
+         "${MINGW_PACKAGE_PREFIX}-python-setuptools"
          "${MINGW_PACKAGE_PREFIX}-python-cx-logging"
-         "${MINGW_PACKAGE_PREFIX}-python-importlib-metadata")
-makedepends=("${MINGW_PACKAGE_PREFIX}-python-setuptools")
+         "${MINGW_PACKAGE_PREFIX}-python-lief")
+makedepends=("${MINGW_PACKAGE_PREFIX}-cc"
+             "${MINGW_PACKAGE_PREFIX}-tools"
+             "${MINGW_PACKAGE_PREFIX}-python-setuptools")
 options=('staticlibs' 'strip' '!debug')
 source=(cx_Freeze-${pkgver}.tar.gz::https://pypi.io/packages/source/c/cx_Freeze/cx_Freeze-${pkgver}.tar.gz)
-sha256sums=('3f16d3d40f7f2e1f6032132170d8fd4ba2f4f9ea419f13d7a68091bbe1949583')
+sha256sums=('e620c61a57518d35033a85696501e0e24920401e2564923bcf034dc3b9c259ca')
 
 prepare() {
   rm -Rf python-${_realname}-${CARCH}
@@ -46,8 +49,9 @@ package() {
     --root="${pkgdir}" --optimize=1 --skip-build
 
   # fix python command in files
-  for filename in "${pkgdir}${MINGW_PREFIX}/bin/cxfreeze*script.py"; do
-    sed -e "s|${_mingw_prefix}/bin/||g" -i ${filename}
+  for _f in "${pkgdir}${MINGW_PREFIX}"/bin/*-script.py; do
+    # Remove shebang line
+    sed -e '1 { s/^#!.*$// }' -i "${_f}"
   done
 }
 

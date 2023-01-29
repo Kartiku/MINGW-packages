@@ -6,15 +6,16 @@ pkgname=("${MINGW_PACKAGE_PREFIX}-python-${_realname}")
 provides=("${MINGW_PACKAGE_PREFIX}-python3-${_realname}")
 conflicts=("${MINGW_PACKAGE_PREFIX}-python3-${_realname}")
 replaces=("${MINGW_PACKAGE_PREFIX}-python3-${_realname}")
-pkgver=6.23.3
+pkgver=6.65.2
 pkgrel=1
 pkgdesc="Advanced Quickcheck style testing library for Python (mingw-w64)"
 arch=('any')
-mingw_arch=('mingw32' 'mingw64' 'ucrt64' 'clang64' 'clang32')
+mingw_arch=('mingw32' 'mingw64' 'ucrt64' 'clang64' 'clang32' 'clangarm64')
 url='https://hypothesis.readthedocs.org'
 license=('MIT')
 depends=("${MINGW_PACKAGE_PREFIX}-python-attrs"
-         "${MINGW_PACKAGE_PREFIX}-python-sortedcontainers")
+         "${MINGW_PACKAGE_PREFIX}-python-sortedcontainers"
+         "${MINGW_PACKAGE_PREFIX}-python-exceptiongroup")
 optdepends=("${MINGW_PACKAGE_PREFIX}-python-pytz: for datetime and django module"
             "${MINGW_PACKAGE_PREFIX}-python-faker: for fakefactory and django module"
             "${MINGW_PACKAGE_PREFIX}-python-django: for django module"
@@ -34,7 +35,7 @@ makedepends=("${MINGW_PACKAGE_PREFIX}-python-setuptools")
 #              "${MINGW_PACKAGE_PREFIX}-python-pandas")
 options=('staticlibs' 'strip' '!debug')
 source=("${_realname}-${pkgver}.tar.gz"::"https://github.com/HypothesisWorks/hypothesis/archive/hypothesis-python-${pkgver}.tar.gz")
-sha512sums=('9212076c61175960fd638b9b75b8a0f51b75969c93c6b5b2aedacadfc08860931b8f1bfad21b34ca34c0ee64609b34b3027342bbf093aa0e5c304706f081f60a')
+sha512sums=('0955e95d9d97f44170dfc937c3ea6b43f6c4ac74dbb48e16a4998e735310f72448083382f6628b4bb9620ac0d21d6c749a5464c6a7caee24cdb7af8cd0c01dcb')
 
 # Helper macros to help make tasks easier #
 apply_patch_with_msg() {
@@ -93,4 +94,8 @@ package() {
   MSYS2_ARG_CONV_EXCL="--prefix=;--install-scripts=;--install-platlib=" \
   ${MINGW_PREFIX}/bin/python setup.py install --prefix=${MINGW_PREFIX} \
     --root="${pkgdir}" --optimize=1 --skip-build
+  for _f in "${pkgdir}${MINGW_PREFIX}"/bin/*-script.py; do
+    # Remove shebang line
+    sed -e '1 { s/^#!.*$// }' -i "${_f}"
+  done
 }

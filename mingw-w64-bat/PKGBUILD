@@ -3,20 +3,24 @@
 _realname=bat
 pkgbase=mingw-w64-${_realname}
 pkgname="${MINGW_PACKAGE_PREFIX}-${_realname}"
-pkgver=0.18.3
+pkgver=0.22.1
 pkgrel=1
 pkgdesc="Cat clone with syntax highlighting and git integration (mingw-w64)"
 arch=('any')
-mingw_arch=('mingw32' 'mingw64' 'ucrt64' 'clang64')
+mingw_arch=('mingw32' 'mingw64' 'ucrt64' 'clang64' 'clang32')
 url='https://github.com/sharkdp/bat'
 license=(APACHE MIT)
+depends=(
+  "${MINGW_PACKAGE_PREFIX}-libgit2"
+  "${MINGW_PACKAGE_PREFIX}-oniguruma"
+  "${MINGW_PACKAGE_PREFIX}-gcc-libs"
+)
 makedepends=(
   "${MINGW_PACKAGE_PREFIX}-rust"
 )
-depends=("${MINGW_PACKAGE_PREFIX}-gcc-libs")
 options=('staticlibs' 'strip')
 source=("${_realname}-${pkgver}.tar.gz::https://github.com/sharkdp/bat/archive/refs/tags/v${pkgver}.tar.gz")
-sha256sums=('dff7fa5222f40c7b3c783d3ceb0c3ffb35662f1198b00d785f80f3f1523399dd')
+sha256sums=('25e45debf7c86794281d63a51564feefa96fdfdf575381e3adc5c06653ecaeca')
 
 prepare() {
   cp -r ${_realname}-${pkgver} build-${MSYSTEM}
@@ -28,11 +32,13 @@ prepare() {
 build() {
   ${MINGW_PREFIX}/bin/cargo build \
   --release \
+  --frozen \
   --manifest-path build-${MSYSTEM}/Cargo.toml
 }
 
 package() {
   ${MINGW_PREFIX}/bin/cargo install \
+  --frozen \
   --offline \
   --no-track \
   --path build-${MSYSTEM} \

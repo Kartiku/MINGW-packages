@@ -2,23 +2,25 @@ _compiler=clang
 _realname=flang
 pkgbase=mingw-w64-${_realname}
 pkgname=("${MINGW_PACKAGE_PREFIX}-${_realname}")
-pkgver=13.0.0
+_version=15.0.7
+_rc=""
+_tag=llvmorg-${_version}${_rc}
+pkgver=${_version}${_rc/-/}
 pkgrel=2
 pkgdesc="Fortran frontend for LLVM (mingw-w64)"
 arch=('any')
-mingw_arch=('mingw32' 'mingw64' 'ucrt64' 'clang64' 'clang32' 'clangarm64')
+mingw_arch=('mingw64' 'ucrt64' 'clang64')
 url="https://flang.llvm.org/"
 license=("custom:Apache 2.0 with LLVM Exception")
-depends=("${MINGW_PACKAGE_PREFIX}-clang=${pkgver}"
-         "${MINGW_PACKAGE_PREFIX}-llvm=${pkgver}"
-         "${MINGW_PACKAGE_PREFIX}-mlir=${pkgver}")
-makedepends=("${MINGW_PACKAGE_PREFIX}-clang-analyzer=${pkgver}"
-             "${MINGW_PACKAGE_PREFIX}-clang-tools-extra=${pkgver}"
-             "${MINGW_PACKAGE_PREFIX}-cmake>=3.4.3"
+provides=($([[ ${MINGW_PACKAGE_PREFIX} != *-clang-* ]] || echo "${MINGW_PACKAGE_PREFIX}-fc"))
+depends=("${MINGW_PACKAGE_PREFIX}-clang"
+         "${MINGW_PACKAGE_PREFIX}-llvm"
+         "${MINGW_PACKAGE_PREFIX}-mlir")
+makedepends=("${MINGW_PACKAGE_PREFIX}-clang-tools-extra"
+             "${MINGW_PACKAGE_PREFIX}-cmake"
              "${MINGW_PACKAGE_PREFIX}-lld"
              "${MINGW_PACKAGE_PREFIX}-ninja"
              "${MINGW_PACKAGE_PREFIX}-pkg-config"
-             "${MINGW_PACKAGE_PREFIX}-polly=${pkgver}"
              "gawk"
              $([[ "$_compiler" == "clang" ]] && echo \
                "${MINGW_PACKAGE_PREFIX}-compiler-rt" \
@@ -27,15 +29,21 @@ makedepends=("${MINGW_PACKAGE_PREFIX}-clang-analyzer=${pkgver}"
                "${MINGW_PACKAGE_PREFIX}-gcc")
              )
 options=('!debug' 'strip')
-source=("https://github.com/llvm/llvm-project/releases/download/llvmorg-${pkgver}/flang-${pkgver}.src.tar.xz"{,.sig}
+source=("https://github.com/llvm/llvm-project/releases/download/${_tag}/flang-${pkgver}.src.tar.xz"{,.sig}
+        "https://github.com/llvm/llvm-project/releases/download/${_tag}/cmake-${pkgver}.src.tar.xz"{,.sig}
         "0001-cast-cxx11-narrowing.patch"
-        "0002-cmake-22162.patch")
-sha256sums=('13bc580342bec32b6158c8cddeb276bd428d9fc8fd23d13179c8aa97bbba37d5'
+        "0002-cmake-22162.patch"
+        "0003-do-not-link-to-llvm-dylib.patch")
+sha256sums=('eb217f0efab3aacb4f1777e43ef5ed2186d4a03a6140613623b3ac764e934860'
             'SKIP'
-            'f8babd240968599597cf2b906fad44b62e2d92ac7ea144530a3f9542e96e06b1'
-            '77fb0612217b6af7a122f586a9d0d334cd48bb201509bf72e8f8e6244616e895')
+            '8986f29b634fdaa9862eedda78513969fe9788301c9f2d938f4c10a3e7a3e7ea'
+            'SKIP'
+            'ba08064d737a2aa173125e88c3900dce804220fb0562596b03130177c2139312'
+            '77fb0612217b6af7a122f586a9d0d334cd48bb201509bf72e8f8e6244616e895'
+            '8d70b33d20d74801aeee82173944fed3b33ae185031537e1b50a640238f7a988')
 validpgpkeys=('B6C8F98282B944E3B0D5C2530FC3042E345AD05D'  # Hans Wennborg, Google.
-              '474E22316ABF4785A88C6E8EA2C794A986419D8A') # Tom Stellard
+              '474E22316ABF4785A88C6E8EA2C794A986419D8A'  # Tom Stellard
+              'D574BD5D1D0E98895E3BF90044F2485E45D59042') # Tobias Hieta
 
 apply_patch_with_msg() {
   for _patch in "$@"
@@ -46,11 +54,13 @@ apply_patch_with_msg() {
 }
 
 prepare() {
+  mv cmake-$pkgver.src cmake
   cd "${srcdir}/flang-${pkgver}.src"
 
   apply_patch_with_msg \
     "0001-cast-cxx11-narrowing.patch" \
-    "0002-cmake-22162.patch"
+    "0002-cmake-22162.patch" \
+    "0003-do-not-link-to-llvm-dylib.patch"
 }
 
 build() {
@@ -117,4 +127,5 @@ check() {
 
 package() {
   DESTDIR="${pkgdir}" cmake --install "${srcdir}/build-${MSYSTEM}"
+  cp "${pkgdir}"${MINGW_PREFIX}/bin/flang-new "${pkgdir}"${MINGW_PREFIX}/bin/flang.exe
 }

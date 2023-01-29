@@ -4,21 +4,24 @@ _realname=partio
 pkgbase=mingw-w64-${_realname}
 pkgname="${MINGW_PACKAGE_PREFIX}-${_realname}"
 pkgver=1.14.6
-pkgrel=1
+pkgrel=3
 pkgdesc="A library for particle IO and manipulation (mingw-w64)"
 arch=('any')
-mingw_arch=('mingw32' 'mingw64' 'ucrt64' 'clang64' 'clang32')
+mingw_arch=('mingw32' 'mingw64' 'ucrt64' 'clang64' 'clang32' 'clangarm64')
 url="https://github.com/wdas/partio/"
 license=("custom")
 depends=("${MINGW_PACKAGE_PREFIX}-freeglut"
-         "${MINGW_PACKAGE_PREFIX}-zlib")
+         "${MINGW_PACKAGE_PREFIX}-zlib"
+         "${MINGW_PACKAGE_PREFIX}-gcc-libs"
+         "${MINGW_PACKAGE_PREFIX}-libwinpthread-git")
 makedepends=("${MINGW_PACKAGE_PREFIX}-cmake"
              "${MINGW_PACKAGE_PREFIX}-ninja"
              "${MINGW_PACKAGE_PREFIX}-doxygen"
              "${MINGW_PACKAGE_PREFIX}-graphviz"
              "${MINGW_PACKAGE_PREFIX}-python"
              "${MINGW_PACKAGE_PREFIX}-pkg-config"
-             "${MINGW_PACKAGE_PREFIX}-swig")
+             "${MINGW_PACKAGE_PREFIX}-swig"
+             "${MINGW_PACKAGE_PREFIX}-cc")
 optdepends=("${MINGW_PACKAGE_PREFIX}-python3: Python module for partio")
 options=('staticlibs' '!emptydirs' 'strip' '!debug')
 source=(${_realname}-${pkgver}.tar.gz::https://github.com/wdas/partio/archive/v${pkgver}.tar.gz
@@ -53,6 +56,7 @@ build() {
     -G"Ninja" \
     -DCMAKE_INSTALL_PREFIX=${MINGW_PREFIX} \
     -DPARTIO_BUILD_SHARED_LIBS=ON \
+    -DGLUT_glut_LIBRARY_RELEASE=${MINGW_PREFIX}/lib/libfreeglut.dll.a \
     ${extra_config} \
     ../${_realname}-${pkgver}
 

@@ -3,21 +3,22 @@
 _realname=aws-c-common
 pkgbase=mingw-w64-${_realname}
 pkgname=("${MINGW_PACKAGE_PREFIX}-${_realname}")
-pkgver=0.6.15
-pkgrel=1
-pkgdesc="Core c99 package for AWS SDK for C. Includes cross-platform primitives, configuration, data structures, and error handling (mingw-w64)."
+pkgver=0.8.9
+pkgrel=2
+pkgdesc="Core c99 package for AWS SDK for C. Includes cross-platform primitives, configuration, data structures, and error handling (mingw-w64)"
 arch=('any')
-mingw_arch=('mingw32' 'mingw64' 'ucrt64' 'clang64' 'clang32')
+mingw_arch=('mingw32' 'mingw64' 'ucrt64' 'clang64' 'clang32' 'clangarm64')
 url="https://github.com/awslabs/aws-c-common"
-license=('Apache-2.0')
+license=('spdx:Apache-2.0')
 depends=("${MINGW_PACKAGE_PREFIX}-gcc-libs")
 makedepends=("${MINGW_PACKAGE_PREFIX}-cmake"
+             "${MINGW_PACKAGE_PREFIX}-cc"
              "${MINGW_PACKAGE_PREFIX}-ninja")
 conflicts=("${MINGW_PACKAGE_PREFIX}-aws-sdk-cpp<1.8.149")
 options=('strip' '!debug' 'staticlibs')
 source=("${_realname}-${pkgver}.tar.gz"::"${url}/archive/v${pkgver}.tar.gz")
 noextract=("${_realname}-${pkgver}.tar.gz")
-sha256sums=('eb3ead3fb7a1f09c046393f776a96a0f50ae5f38c70d462273084280383669f1')
+sha256sums=('2f3fbaf7c38eae5a00e2a816d09b81177f93529ae8ba1b82dc8f31407565327a')
 
 prepare() {
   [[ -d "${srcdir}/${_realname}-${pkgver}" ]] && rm -rf "${srcdir}/${_realname}-${pkgver}"
@@ -39,8 +40,8 @@ build() {
   fi
 
   echo "Building static library"
-  [[ -d "${srcdir}/build-${CARCH}-static" ]] && rm -rf "${srcdir}/build-${CARCH}-static"
-  mkdir -p "${srcdir}/build-${CARCH}-static" && cd "${srcdir}/build-${CARCH}-static"
+  [[ -d "${srcdir}/build-${MSYSTEM}-static" ]] && rm -rf "${srcdir}/build-${MSYSTEM}-static"
+  mkdir -p "${srcdir}/build-${MSYSTEM}-static" && cd "${srcdir}/build-${MSYSTEM}-static"
 
   CFLAGS+=" -Wno-format" \
   MSYS2_ARG_CONV_EXCL="-DCMAKE_INSTALL_PREFIX=" \
@@ -54,8 +55,8 @@ build() {
   ${MINGW_PREFIX}/bin/cmake.exe --build ./
 
   echo "Building shared library"
-  [[ -d "${srcdir}/build-${CARCH}-shared" ]] && rm -rf "${srcdir}/build-${CARCH}-shared"
-  mkdir -p "${srcdir}/build-${CARCH}-shared" && cd "${srcdir}/build-${CARCH}-shared"
+  [[ -d "${srcdir}/build-${MSYSTEM}-shared" ]] && rm -rf "${srcdir}/build-${MSYSTEM}-shared"
+  mkdir -p "${srcdir}/build-${MSYSTEM}-shared" && cd "${srcdir}/build-${MSYSTEM}-shared"
 
   CFLAGS+=" -Wno-format" \
   MSYS2_ARG_CONV_EXCL="-DCMAKE_INSTALL_PREFIX=" \
@@ -70,11 +71,11 @@ build() {
 }
 
 package() {
-  cd "${srcdir}/build-${CARCH}-static"
-  DESTDIR="${pkgdir}" ${MINGW_PREFIX}/bin/cmake.exe --build ./ --target install
+  cd "${srcdir}/build-${MSYSTEM}-static"
+  DESTDIR="${pkgdir}" ${MINGW_PREFIX}/bin/cmake.exe --install ./
 
-  cd "${srcdir}/build-${CARCH}-shared"
-  DESTDIR="${pkgdir}" ${MINGW_PREFIX}/bin/cmake.exe --build ./ --target install
+  cd "${srcdir}/build-${MSYSTEM}-shared"
+  DESTDIR="${pkgdir}" ${MINGW_PREFIX}/bin/cmake.exe --install ./
 
   cd "${srcdir}/${_realname}-${pkgver}"
   install -Dm644 LICENSE "${pkgdir}${MINGW_PREFIX}/share/licenses/${_realname}/LICENSE"

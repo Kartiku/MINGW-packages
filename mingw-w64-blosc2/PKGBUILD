@@ -4,20 +4,22 @@ _realname=blosc2
 _srcname=c-blosc2
 pkgbase=mingw-w64-${_realname}
 pkgname=("${MINGW_PACKAGE_PREFIX}-${_realname}")
-pkgver=2.0.4
+pkgver=2.6.1
 pkgrel=1
 pkgdesc="A blocking, shuffling and lossless compression library (mingw-w64)"
 arch=('any')
-mingw_arch=('mingw32' 'mingw64' 'ucrt64' 'clang64' 'clang32')
+mingw_arch=('mingw32' 'mingw64' 'ucrt64' 'clang64' 'clang32' 'clangarm64')
 url='https://blosc.org/'
-license=('BSD-3-Clause')
+license=('spdx:BSD-3-Clause')
 depends=("${MINGW_PACKAGE_PREFIX}-lz4"
          "${MINGW_PACKAGE_PREFIX}-zlib"
-         "${MINGW_PACKAGE_PREFIX}-zstd")
+         "${MINGW_PACKAGE_PREFIX}-zstd"
+         "${MINGW_PACKAGE_PREFIX}-libwinpthread-git")
 makedepends=("${MINGW_PACKAGE_PREFIX}-cmake"
+             "${MINGW_PACKAGE_PREFIX}-cc"
              "${MINGW_PACKAGE_PREFIX}-ninja")
 source=("${_realname}-${pkgver}.tar.gz"::"https://github.com/Blosc/c-blosc2/archive/v${pkgver}.tar.gz")
-sha256sums=('90c78edcc262759dd16d243141513310624bb4fda3d98ac34dcfb78255e151c1')
+sha256sums=('514a793368093893c1a7cae030f7e31faca7f86465ae69dd576f256d8bf28c08')
 
 prepare() {
   cd "${srcdir}"/${_srcname}-${pkgver}

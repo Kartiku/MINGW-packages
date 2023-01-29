@@ -20,11 +20,11 @@ pkgname=("${MINGW_PACKAGE_PREFIX}-${_realname}"
          $([[ "$_enable_jit" == "yes" ]] && echo "${MINGW_PACKAGE_PREFIX}-libgccjit")
         )
 #_snapshot=20181214
-pkgver=11.2.0
+pkgver=12.2.0
 #_majorver=${pkgver:0:1}
 #_sourcedir=${_realname}-${_majorver}-${_snapshot}
 _sourcedir=${_realname}-${pkgver}
-pkgrel=1
+pkgrel=10
 pkgdesc="GCC for the MinGW-w64"
 arch=('any')
 mingw_arch=('mingw32' 'mingw64' 'ucrt64')
@@ -44,8 +44,10 @@ makedepends=("${MINGW_PACKAGE_PREFIX}-${_realname}"
              "${MINGW_PACKAGE_PREFIX}-windows-default-manifest"
              "${MINGW_PACKAGE_PREFIX}-winpthreads"
              "${MINGW_PACKAGE_PREFIX}-zlib"
-             "${MINGW_PACKAGE_PREFIX}-zstd")
-options=('staticlibs' '!emptydirs') # '!strip' 'debug')
+             "${MINGW_PACKAGE_PREFIX}-zstd"
+             "${MINGW_PACKAGE_PREFIX}-gperf"
+             "${MINGW_PACKAGE_PREFIX}-autotools")
+options=('!emptydirs') # '!strip' 'debug')
 source=("https://ftp.gnu.org/gnu/gcc/${_realname}-${pkgver%%+*}/${_realname}-${pkgver}.tar.xz"{,.sig}
         #https://www.mirrorservice.org/sites/sourceware.org/pub/gcc/snapshots/${_majorver}-${_snapshot}/gcc-${_majorver}-${_snapshot}.tar.xz
         "gdbinit"
@@ -61,27 +63,29 @@ source=("https://ftp.gnu.org/gnu/gcc/${_realname}-${pkgver%%+*}/${_realname}-${p
         0012-Handle-spaces-in-path-for-default-manifest.patch
         0014-gcc-9-branch-clone_function_name_1-Retain-any-stdcall-suffix.patch
         0020-libgomp-Don-t-hard-code-MS-printf-attributes.patch
-        0021-fix-ada-exception-propagation.patch
-        0140-gcc-8.2.0-diagnostic-color.patch
-        0150-gcc-10.2.0-libgcc-ldflags.patch)
-sha256sums=('d08edc536b54c372a1010ff6619dd274c0f1603aa49212ba20f7aa2cda36fa8b'
+        0021-PR14940-Allow-a-PCH-to-be-mapped-to-a-different-addr.patch
+        0140-gcc-diagnostic-color.patch
+        0200-add-m-no-align-vector-insn-option-for-i386.patch
+        0300-override-builtin-printf-format.patch)
+sha256sums=('e549cf9cf3594a00e27b6589d4322d70e0720cdd213f39beb4181e06926230ff'
             'SKIP'
             'bce81824fc89e5e62cca350de4c17a27e27a18a1a1ad5ca3492aec1fc5af3234'
-            '1247e81571c908548b4d9aaa3df1ad8fd73aad7b81e7eafea12d53bbada70e94'
-            '5b8ab5a54ebdd10c9802ea431b935ff4ba225eec6ca92824cfddfcf2ee8ac910'
-            '388f423a67e4be6f547ca7e340ff8ee4c78b1ed83f3fd698daa409e309911807'
-            'bd1c201febdf292570b0da9dcc066a237916ab3166dce3610487814f131517e5'
-            'b151b2f2a6db47b67a20a725685516e2afd4df64cda65fcd3a322bef5c633ac7'
-            '3629446c0039d9061cfedcb6d7a7589279588bb4601c7ce233546d357bd4be34'
-            '2e4f7d0ef739aec8986eb06a2baadee552ebc2e8be661c39a448e93515179eb5'
-            'ec58aafba0174313451c282339bbd67ed0b11bca034c29023e0138b61441cf71'
-            '3402f11c3edb3a2b0f27f7159c476879e1e6cddb05ac0327968d89ea245044c7'
-            '11dd5388a1e1c0a2bc8bc3824726598784b9b9e0896a3d77950ba6a4569f1128'
-            '21e31addcf13bc6fa6650b02ed0f2e195a1226260ae48c536840cc9230de2cfc'
-            '276ecc392c777d4b17d771a987e80dca50ff25d8f65671d5de139be73997064b'
-            'bbd1374f4fccaadd641959725f222acab789f4bead9718d04f7e500885a14f30'
-            '5240a9e731b45c17a164066c7eb193c1fbee9fd8d9a2a5afa2edbcde9510da47'
-            '7f0b4e45d933e18c9d8bd2afcd83e4f52e97e2e25dd41bfa0cba755c70e591c7')
+            '2c1a5fdb39d8ecf449632b0ebdd4b41bf9e070aea4093f299513cad95484b5c3'
+            '3f55d6493d459f6b875f750735231df140339b62eb0d2cc5edfbf10332c1bd5f'
+            'be1dd73bca4e802df5e263a2b27355c3b42d7298491b94fdcc35e00be2e2cb68'
+            '2a208d5b13f370c6b2187c7932a13d6caedfc3722f02afc8e5ee9426fb8e64cc'
+            '56832cb8f939fe14eaadf8fb2d4c784012acc87e1661320398b42b7389643bb7'
+            '87472619bb0f9520cce20e3e5f5f57b9ab1fbea297bc81cb00216697d64084b1'
+            'd7066b206d7b4d81a25d4f9c2ee88751e041b81176d915d8175b9b85f5cbc425'
+            'acaf6f1b8df91bf0fe7c363b2abd10c2f7b967b563761160892559358da9bf91'
+            'b1ddd82c9a4f0cd7ba3a4877510b56b019304d04ed1d804626eb511ae206dd60'
+            '0483451eaed8b36b8fbdc30d10a04d73424d58ca83dde0320902d39f0ef623a6'
+            'b3c6dc1fe61ba3c46d15b5bd38f4a94cd8133923eb9832679944f534d46f7318'
+            'a501666d1f5cae726f2b2f1618d187a397c3525c0ffa1bcb03a441fd8e8020cf'
+            'a4b4f7e97635ddf0443ee17cd093b9d10953f97eb290466999585d02ef8bf72d'
+            'e0a5b470f49a29f20215cc9f9d04c1cb9969dff6f0e546542799d3a693ef1c84'
+            'ce832a1be7271a2249e4dd46647474b37cf51f578678d9bd9433b32aacefb528'
+            '0d82cf1d748c9f1d4d3c7ee43ca3be1b6efbd431dc13ce652ae00ee489d67eec')
 validpgpkeys=(F3691687D867B81B51CE07D9BBE43771487328A9  # bpiotrowski@archlinux.org
               86CFFCA918CF3AF47147588051E8B148A9999C34  # evangelos@foutrelis.com
               13975A70E63C361C73AE69EF6EEB81F8981C74C7  # richard.guenther@gmail.com
@@ -124,19 +128,27 @@ prepare() {
     0011-Enable-shared-gnat-implib.patch \
     0012-Handle-spaces-in-path-for-default-manifest.patch \
     0014-gcc-9-branch-clone_function_name_1-Retain-any-stdcall-suffix.patch \
-    0020-libgomp-Don-t-hard-code-MS-printf-attributes.patch
-
-  # https://gcc.gnu.org/bugzilla/show_bug.cgi?id=100486 :
-  apply_patch_with_msg \
-    0021-fix-ada-exception-propagation.patch
+    0020-libgomp-Don-t-hard-code-MS-printf-attributes.patch \
+    0021-PR14940-Allow-a-PCH-to-be-mapped-to-a-different-addr.patch
 
   # Enable diagnostic color under mintty
-  # Вячеслав Петрищев <vyachemail@gmail.com>
+  # based on https://github.com/BurntSushi/ripgrep/issues/94#issuecomment-261761687
   apply_patch_with_msg \
-    0140-gcc-8.2.0-diagnostic-color.patch
+    0140-gcc-diagnostic-color.patch
 
+  # workaround for AVX misalignment issue for pass-by-value arguments
+  #   cf. https://github.com/msys2/MSYS2-packages/issues/1209
+  #   cf. https://sourceforge.net/p/mingw-w64/discussion/723797/thread/bc936130/ 
+  #  Issue is longstanding upstream at https://gcc.gnu.org/bugzilla/show_bug.cgi?id=54412
+  #  Potential alternative: https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=939559
+  # https://github.com/msys2/MINGW-packages/pull/8317#issuecomment-824548411
   apply_patch_with_msg \
-    0150-gcc-10.2.0-libgcc-ldflags.patch
+    0200-add-m-no-align-vector-insn-option-for-i386.patch
+
+  # Patch from https://gcc.gnu.org/pipermail/gcc-patches/2022-January/588341.html
+  # Related bug: https://gcc.gnu.org/bugzilla/show_bug.cgi?id=95130
+  apply_patch_with_msg \
+    0300-override-builtin-printf-format.patch
 
   # do not expect ${prefix}/mingw symlink - this should be superceded by
   # 0005-Windows-Don-t-ignore-native-system-header-dir.patch .. but isn't!
@@ -144,13 +156,13 @@ prepare() {
 
   # change hardcoded /mingw prefix to the real prefix .. isn't this rubbish?
   # it might work at build time and could be important there but beyond that?!
-  local MINGW_NATIVE_PREFIX=$(cygpath -am ${MINGW_PREFIX}/${MINGW_CHOST})
+  local MINGW_NATIVE_PREFIX=$(cygpath -am ${MINGW_PREFIX})
   sed -i "s#\\/mingw\\/#${MINGW_NATIVE_PREFIX//\//\\/}\\/#g" gcc/config/i386/mingw32.h
 }
 
 build() {
-  [[ -d ${srcdir}/build-${MINGW_CHOST} ]] && rm -rf ${srcdir}/build-${MINGW_CHOST}
-  mkdir -p ${srcdir}/build-${MINGW_CHOST} && cd ${srcdir}/build-${MINGW_CHOST}
+  [[ -d ${srcdir}/build-${MSYSTEM} ]] && rm -rf ${srcdir}/build-${MSYSTEM}
+  mkdir -p ${srcdir}/build-${MSYSTEM} && cd ${srcdir}/build-${MSYSTEM}
 
   declare -a extra_config
   if check_option "debug" "n"; then
@@ -161,14 +173,16 @@ build() {
 
   case "${CARCH}" in
     i686)
-      local _conf="--disable-sjlj-exceptions --with-dwarf2"
+      extra_config+=(
+        "--disable-sjlj-exceptions"
+        "--with-dwarf2"
+      )
       LDFLAGS+=" -Wl,--large-address-aware"
-      local _arch=i686
+      local _arch=pentium4
     ;;
 
     x86_64)
-      local _arch=x86-64
-      local _conf=""
+      local _arch=nocona
     ;;
   esac
 
@@ -186,8 +200,27 @@ build() {
   # so libgomp DLL gets built despide static libdl
   export lt_cv_deplibs_check_method='pass_all'
 
-  local _LDFLAGS_FOR_TARGET="$LDFLAGS"
-  LDFLAGS+=" -Wl,--disable-dynamicbase"
+  # https://gcc.gnu.org/bugzilla/show_bug.cgi?id=105507#c3
+  # At least with mingw32 + dwarf-2 exceptions there can only be one libgcc in
+  # process, or exceptions will no longer work. Since some of the gcc deps are
+  # linked dynamically like gmp/zlib/zstd and those pull in libgcc we can't
+  # allow libgcc to be linked statically. The default is "-static-libstdc++
+  # -static-libgcc" for both, so we drop "-static-libgcc" here:
+  extra_config+=(
+    '--with-boot-ldflags="-static-libstdc++"'
+    '--with-stage1-ldflags="-static-libstdc++"'
+  )
+
+  # -fstack-protector-strong breaks libssp
+  # https://github.com/msys2/MINGW-packages/issues/13830
+  # TODO: This can be removed once we drop libssp all together
+  CFLAGS+=" -fno-stack-protector"
+
+  # TODO: remove this with gcc 13.x, which includes a proper fix:
+  # https://gcc.gnu.org/git/?p=gcc.git;a=commit;h=902c755930326cb4405672aa3ea13c35c653cbff
+  CPPFLAGS+=" -DWIN32_LEAN_AND_MEAN"
+  # In addition adaint.c does `#include <accctrl.h>` which pulls in msxml.h, hacky hack:
+  CPPFLAGS+=" -DCOM_NO_WINDOWS_H"
 
   ../${_sourcedir}/configure \
     --prefix=${MINGW_PREFIX} \
@@ -195,14 +228,15 @@ build() {
     --build=${MINGW_CHOST} \
     --host=${MINGW_CHOST} \
     --target=${MINGW_CHOST} \
-    --with-native-system-header-dir=${MINGW_PREFIX}/${MINGW_CHOST}/include \
+    --with-native-system-header-dir=${MINGW_PREFIX}/include \
     --libexecdir=${MINGW_PREFIX}/lib \
     --enable-bootstrap \
     --enable-checking=release \
     --with-arch=${_arch} \
     --with-tune=generic \
     --enable-languages=${_languages} \
-    --enable-shared --enable-static \
+    --enable-shared \
+    --enable-static \
     --enable-libatomic \
     --enable-threads=${_threads} \
     --enable-graphite \
@@ -210,7 +244,6 @@ build() {
     --enable-libstdcxx-filesystem-ts \
     --enable-libstdcxx-time \
     --disable-libstdcxx-pch \
-    ${extra_config} \
     --enable-lto \
     --enable-libgomp \
     --disable-multilib \
@@ -224,11 +257,9 @@ build() {
     --with-{gmp,mpfr,mpc,isl}=${MINGW_PREFIX} \
     --with-pkgversion="Rev${pkgrel}, Built by MSYS2 project" \
     --with-bugurl="https://github.com/msys2/MINGW-packages/issues" \
-    --with-gnu-as --with-gnu-ld \
-    --with-boot-ldflags="${LDFLAGS} -static-libstdc++ -static-libgcc" \
-    LDFLAGS_FOR_TARGET="${_LDFLAGS_FOR_TARGET}" \
-    --enable-linker-plugin-flags='LDFLAGS=-static-libstdc++\ -static-libgcc\ '"${_LDFLAGS_FOR_TARGET// /\\ }"'\ -Wl,--stack,12582912' \
-    ${_conf}
+    --with-gnu-as \
+    --with-gnu-ld \
+    "${extra_config[@]}"
 
   # While we're debugging -fopenmp problems at least.
   # .. we may as well not strip anything.
@@ -249,11 +280,9 @@ build() {
 
 package_gcc-libs() {
   pkgdesc="GNU Compiler Collection (libraries) for MinGW-w64"
-  depends=("${MINGW_PACKAGE_PREFIX}-gmp"
-           "${MINGW_PACKAGE_PREFIX}-mpc"
-           "${MINGW_PACKAGE_PREFIX}-mpfr"
-           "${MINGW_PACKAGE_PREFIX}-libwinpthread")
-  provides=("${MINGW_PACKAGE_PREFIX}-libssp")
+  depends=("${MINGW_PACKAGE_PREFIX}-libwinpthread")
+  provides=("${MINGW_PACKAGE_PREFIX}-libssp"
+            "${MINGW_PACKAGE_PREFIX}-omp")
 
   # Licensing information
 
@@ -292,13 +321,16 @@ package_gcc() {
            "${MINGW_PACKAGE_PREFIX}-headers"
            "${MINGW_PACKAGE_PREFIX}-isl"
            "${MINGW_PACKAGE_PREFIX}-libiconv"
+           "${MINGW_PACKAGE_PREFIX}-gmp"
+           "${MINGW_PACKAGE_PREFIX}-mpfr"
            "${MINGW_PACKAGE_PREFIX}-mpc"
            "${MINGW_PACKAGE_PREFIX}-${_realname}-libs=${pkgver}-${pkgrel}"
            "${MINGW_PACKAGE_PREFIX}-windows-default-manifest"
            "${MINGW_PACKAGE_PREFIX}-winpthreads"
            "${MINGW_PACKAGE_PREFIX}-zlib"
            "${MINGW_PACKAGE_PREFIX}-zstd")
-  provides=("${MINGW_PACKAGE_PREFIX}-${_realname}-base")
+  provides=("${MINGW_PACKAGE_PREFIX}-${_realname}-base"
+            "${MINGW_PACKAGE_PREFIX}-cc")
   conflicts=("${MINGW_PACKAGE_PREFIX}-${_realname}-base")
 
   mkdir -p ${pkgdir}${MINGW_PREFIX}/{bin,include,lib,share}
@@ -316,16 +348,16 @@ package_gcc() {
   cp bin/g++.exe                                        ${pkgdir}${MINGW_PREFIX}/bin/
   cp bin/${MINGW_CHOST}-c++.exe                         ${pkgdir}${MINGW_PREFIX}/bin/
   cp bin/${MINGW_CHOST}-g++.exe                         ${pkgdir}${MINGW_PREFIX}/bin/
-  cp bin/${MINGW_CHOST}-gcc-${pkgver%%+*}.exe               ${pkgdir}${MINGW_PREFIX}/bin/
+  cp bin/${MINGW_CHOST}-gcc-${pkgver%%+*}.exe           ${pkgdir}${MINGW_PREFIX}/bin/
   cp bin/${MINGW_CHOST}-gcc.exe                         ${pkgdir}${MINGW_PREFIX}/bin/
+  cp bin/${MINGW_CHOST}-gcc.exe                         ${pkgdir}${MINGW_PREFIX}/bin/${MINGW_CHOST}-cc.exe
   cp bin/${MINGW_CHOST}-gcc-ar.exe                      ${pkgdir}${MINGW_PREFIX}/bin/
   cp bin/${MINGW_CHOST}-gcc-nm.exe                      ${pkgdir}${MINGW_PREFIX}/bin/
   cp bin/${MINGW_CHOST}-gcc-ranlib.exe                  ${pkgdir}${MINGW_PREFIX}/bin/
 
-  #cp bin/{libgcc*,libgomp*,libquadmath*,libssp*,libstdc*}.dll ${pkgdir}${MINGW_PREFIX}/bin/
+  #cp bin/{libgcc*,libgomp*,libquadmath*,libstdc*}.dll ${pkgdir}${MINGW_PREFIX}/bin/
   mkdir -p ${pkgdir}${MINGW_PREFIX}/lib/gcc/${MINGW_CHOST}/${pkgver%%+*}/include
   cp lib/gcc/${MINGW_CHOST}/${pkgver%%+*}/include/*.h        ${pkgdir}${MINGW_PREFIX}/lib/gcc/${MINGW_CHOST}/${pkgver%%+*}/include/
-  cp -r lib/gcc/${MINGW_CHOST}/${pkgver%%+*}/include/ssp     ${pkgdir}${MINGW_PREFIX}/lib/gcc/${MINGW_CHOST}/${pkgver%%+*}/include/
   cp -r lib/gcc/${MINGW_CHOST}/${pkgver%%+*}/include-fixed   ${pkgdir}${MINGW_PREFIX}/lib/gcc/${MINGW_CHOST}/${pkgver%%+*}/
   cp -r lib/gcc/${MINGW_CHOST}/${pkgver%%+*}/install-tools   ${pkgdir}${MINGW_PREFIX}/lib/gcc/${MINGW_CHOST}/${pkgver%%+*}/
   #cp -r lib/gcc/${MINGW_CHOST}/${pkgver%%+*}/plugin          ${pkgdir}${MINGW_PREFIX}/lib/gcc/${MINGW_CHOST}/${pkgver%%+*}/
@@ -336,18 +368,18 @@ package_gcc() {
   cp lib/gcc/${MINGW_CHOST}/${pkgver%%+*}/libgcov*           ${pkgdir}${MINGW_PREFIX}/lib/gcc/${MINGW_CHOST}/${pkgver%%+*}/
   cp lib/gcc/${MINGW_CHOST}/${pkgver%%+*}/lto*.exe           ${pkgdir}${MINGW_PREFIX}/lib/gcc/${MINGW_CHOST}/${pkgver%%+*}/
   cp lib/gcc/${MINGW_CHOST}/${pkgver%%+*}/cc1plus.exe        ${pkgdir}${MINGW_PREFIX}/lib/gcc/${MINGW_CHOST}/${pkgver%%+*}/
+  cp lib/gcc/${MINGW_CHOST}/${pkgver%%+*}/g++-mapper-server.exe ${pkgdir}${MINGW_PREFIX}/lib/gcc/${MINGW_CHOST}/${pkgver%%+*}/
 
-  cp lib/libatomic*                                      ${pkgdir}${MINGW_PREFIX}/lib/gcc/${MINGW_CHOST}/${pkgver%%+*}/
-  cp lib/libgcc*                                         ${pkgdir}${MINGW_PREFIX}/lib/gcc/${MINGW_CHOST}/${pkgver%%+*}/
+  cp lib/libatomic*                                      ${pkgdir}${MINGW_PREFIX}/lib/
+  cp lib/libgcc_*                                         ${pkgdir}${MINGW_PREFIX}/lib/
   cp lib/gcc/${MINGW_CHOST}/${pkgver%%+*}/libgcc*            ${pkgdir}${MINGW_PREFIX}/lib/gcc/${MINGW_CHOST}/${pkgver%%+*}/
 
-  cp lib/libgomp*                                        ${pkgdir}${MINGW_PREFIX}/lib/gcc/${MINGW_CHOST}/${pkgver%%+*}/
-  # cp lib/libitm*                                         ${pkgdir}${MINGW_PREFIX}/lib/gcc/${MINGW_CHOST}/${pkgver%%+*}/
-  cp lib/libquadmath*                                    ${pkgdir}${MINGW_PREFIX}/lib/gcc/${MINGW_CHOST}/${pkgver%%+*}/
-  cp lib/libssp*                                         ${pkgdir}${MINGW_PREFIX}/lib/gcc/${MINGW_CHOST}/${pkgver%%+*}/
-  # cp lib/libvtv*                                         ${pkgdir}${MINGW_PREFIX}/lib/gcc/${MINGW_CHOST}/${pkgver%%+*}/
-  cp lib/libstdc++*                                      ${pkgdir}${MINGW_PREFIX}/lib/gcc/${MINGW_CHOST}/${pkgver%%+*}/
-  cp lib/libsupc++*                                      ${pkgdir}${MINGW_PREFIX}/lib/gcc/${MINGW_CHOST}/${pkgver%%+*}/
+  cp lib/libgomp*                                        ${pkgdir}${MINGW_PREFIX}/lib/
+  # cp lib/libitm*                                         ${pkgdir}${MINGW_PREFIX}/lib/
+  cp lib/libquadmath*                                    ${pkgdir}${MINGW_PREFIX}/lib/
+  # cp lib/libvtv*                                         ${pkgdir}${MINGW_PREFIX}/lib/
+  cp lib/libstdc++*                                      ${pkgdir}${MINGW_PREFIX}/lib/
+  cp lib/libsupc++*                                      ${pkgdir}${MINGW_PREFIX}/lib/
 
   #mkdir -p ${pkgdir}${MINGW_PREFIX}/lib/gcc/${MINGW_CHOST}/lib
   #cp ${srcdir}${MINGW_PREFIX}/lib/gcc/${MINGW_CHOST}/lib/libgcc_s.a ${pkgdir}${MINGW_PREFIX}/lib/gcc/${MINGW_CHOST}/${pkgver%%+*}/
@@ -403,6 +435,7 @@ package_gcc-fortran() {
   pkgdesc="GNU Compiler Collection (Fortran) for MinGW-w64"
   depends=("${MINGW_PACKAGE_PREFIX}-${_realname}=${pkgver}-${pkgrel}"
            "${MINGW_PACKAGE_PREFIX}-${_realname}-libgfortran=${pkgver}-${pkgrel}")
+  provides=("${MINGW_PACKAGE_PREFIX}-fc")
 
   mkdir -p ${pkgdir}${MINGW_PREFIX}/{bin,lib,share}
 

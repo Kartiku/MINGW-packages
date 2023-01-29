@@ -3,6 +3,7 @@
 _realname=pkgconf
 pkgbase=mingw-w64-${_realname}
 pkgname="${MINGW_PACKAGE_PREFIX}-${_realname}"
+epoch=1
 pkgver=1.8.0
 pkgrel=2
 pkgdesc='pkg-config compatible utility which does not depend on glib'
@@ -14,7 +15,7 @@ options=('!debug' 'strip')
 provides=("${MINGW_PACKAGE_PREFIX}-pkg-config")
 conflicts=("${MINGW_PACKAGE_PREFIX}-pkg-config")
 replaces=("${MINGW_PACKAGE_PREFIX}-pkg-config")
-makedepends=("${MINGW_PACKAGE_PREFIX}-meson")
+makedepends=("${MINGW_PACKAGE_PREFIX}-meson" "${MINGW_PACKAGE_PREFIX}-cc")
 groups=("${MINGW_PACKAGE_PREFIX}-toolchain")
 source=("https://github.com/pkgconf/pkgconf/archive/refs/tags/$_realname-$pkgver.tar.gz"
         0002-size-t-format.patch

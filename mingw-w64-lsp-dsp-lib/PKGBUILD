@@ -1,0 +1,35 @@
+# Maintainer: Alexandros Theodotou <alex at zrythm dot org>
+
+_realname=lsp-dsp-lib
+pkgbase=mingw-w64-${_realname}
+pkgname="${MINGW_PACKAGE_PREFIX}-${_realname}"
+pkgver=1.0.8
+pkgrel=1
+pkgdesc='SIMD-optimized library for digital signal processing (mingw-w64)'
+arch=('any')
+mingw_arch=('mingw32' 'mingw64' 'ucrt64')
+makedepends=("${MINGW_PACKAGE_PREFIX}-cc"
+             "${MINGW_PACKAGE_PREFIX}-make")
+license=('LGPL3')
+url="https://github.com/lsp-plugins/${_realname}"
+source=("https://github.com/lsp-plugins/$_realname/releases/download/$pkgver/$_realname-src-$pkgver.tar.gz")
+sha256sums=('ee3e6171d897f1e1caf9cd2f8f3872a11ae5326b5161196b8a90f262d67c7a78')
+
+build() {
+  cd "${srcdir}/${_realname}"
+
+  make config PREFIX=${MINGW_PREFIX} ARCHITECTURE=${CARCH}
+  make
+}
+
+package() {
+  cd "${srcdir}/${_realname}"
+
+  make DESTDIR=${pkgdir} install
+  mkdir -p "${pkgdir}${MINGW_PREFIX}/bin"
+  mv "${pkgdir}${MINGW_PREFIX}/lib/"*.dll "${pkgdir}${MINGW_PREFIX}/bin"
+
+  for file in COPYING COPYING.LESSER; do
+    install -Dm644 $file "${pkgdir}${MINGW_PREFIX}/share/licenses/${_realname}/$file"
+  done
+}

@@ -6,11 +6,11 @@ pkgname=("${MINGW_PACKAGE_PREFIX}-python-${_realname}")
 provides=("${MINGW_PACKAGE_PREFIX}-python3-${_realname}")
 conflicts=("${MINGW_PACKAGE_PREFIX}-python3-${_realname}")
 replaces=("${MINGW_PACKAGE_PREFIX}-python3-${_realname}")
-pkgver=9.3.1
+pkgver=16.6.1
 pkgrel=1
 pkgdesc="Faker generates fake data for you (mingw-w64)"
 arch=('any')
-mingw_arch=('mingw32' 'mingw64' 'ucrt64' 'clang64' 'clang32')
+mingw_arch=('mingw32' 'mingw64' 'ucrt64' 'clang64' 'clang32' 'clangarm64')
 url="https://faker.readthedocs.io/en/master/"
 license=('MIT')
 depends=("${MINGW_PACKAGE_PREFIX}-python-dateutil"
@@ -21,7 +21,7 @@ checkdepends=("${MINGW_PACKAGE_PREFIX}-python-ukpostcodeparser"
               "${MINGW_PACKAGE_PREFIX}-python-email-validator")
 options=('staticlibs' 'strip' '!debug')
 source=("${_realname}-${pkgver}.tar.gz"::"https://github.com/joke2k/faker/archive/v${pkgver}.tar.gz")
-sha512sums=('bac4fb7e0f23c0ff6c2ae8347fa1341793d335642a7f89add14452cd7034a13cf0badc6d912bee64774124de72aea434b58d494e1e7ffd3ae313b74fdfda1565')
+sha512sums=('a7e9263270c324aa92bd10090c415e413af9876f1758c9df08cc4b360a9bc28f5522f7d295f794e4d04c513facd7dc7bba8f43fcefd415e0ab776adc5dbb6362')
 
 prepare() {
   cd "${srcdir}"

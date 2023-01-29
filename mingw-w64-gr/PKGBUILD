@@ -3,7 +3,7 @@
 _realname=gr
 pkgbase=mingw-w64-${_realname}
 pkgname="${MINGW_PACKAGE_PREFIX}-${_realname}"
-pkgver=0.62.0
+pkgver=0.71.5
 pkgrel=1
 pkgdesc="A graphics library for visualisation applications (mingw-w64)"
 arch=(any)
@@ -21,24 +21,27 @@ depends=("${MINGW_PACKAGE_PREFIX}-bzip2"
          "${MINGW_PACKAGE_PREFIX}-libtiff"
          "${MINGW_PACKAGE_PREFIX}-qhull"
          "${MINGW_PACKAGE_PREFIX}-qt5-base"
+         $([[ ${CARCH} == i686 ]] || echo "${MINGW_PACKAGE_PREFIX}-qt6-base")
          "${MINGW_PACKAGE_PREFIX}-zlib"
          "${MINGW_PACKAGE_PREFIX}-zeromq")
-makedepends=("${MINGW_PACKAGE_PREFIX}-cmake"
+makedepends=("${MINGW_PACKAGE_PREFIX}-cc"
+             "${MINGW_PACKAGE_PREFIX}-cmake"
              "${MINGW_PACKAGE_PREFIX}-ninja")
-options=("staticlibs" "strip" "!buildflags")
 source=("${_realname}-${pkgver}.tar.gz::https://github.com/sciapp/gr/archive/v${pkgver}.tar.gz")
+sha256sums=('3f3ff8c9ba74cd92187e89e4f0443696f31e34ec49dabca684c07a38aef83751')
 noextract=("${_realname}-${pkgver}.tar.gz")
-sha256sums=("871A4C57572567727831038274D0A28A2272C73A2F8E5B5B72CC856077C135EA")
 
 prepare() {
   # We can't use bsdtar to extract the archive because the archive includes
   # symbolic link.
   rm -rf "${_realname}-${pkgver}"
   tar -xf "${_realname}-${pkgver}.tar.gz" || true
+
   cd "${srcdir}/${_realname}-${pkgver}"
 
   # Set version manually, otherwise it resets to zero
   echo "${pkgver}" > version.txt
+  sed -i "s|\${GR_VERSION}|${pkgver}|g" CMakeLists.txt
 }
 
 build() {
@@ -49,7 +52,6 @@ build() {
     _extra_config+=("-DCMAKE_BUILD_TYPE=Debug")
   fi
 
-  [[ -d "${srcdir}/build-${MSYSTEM}" ]] && rm -rf "${srcdir}/build-${MSYSTEM}"
   mkdir -p "${srcdir}/build-${MSYSTEM}" && cd "${srcdir}/build-${MSYSTEM}"
 
   MSYS2_ARG_CONV_EXCL="-DCMAKE_INSTALL_PREFIX=" \
@@ -66,6 +68,5 @@ package() {
   cd "${srcdir}/build-${MSYSTEM}"
   DESTDIR="${pkgdir}" ${MINGW_PREFIX}/bin/cmake.exe --install .
 
-  cd "${srcdir}/${_realname}-${pkgver}"
-  install -Dm644 LICENSE.md "${pkgdir}${MINGW_PREFIX}/share/licenses/${_realname}/LICENSE.md"
+  install -Dm644 "${srcdir}"/${_realname}-${pkgver}/LICENSE.md "${pkgdir}${MINGW_PREFIX}/share/licenses/${_realname}/LICENSE.md"
 }

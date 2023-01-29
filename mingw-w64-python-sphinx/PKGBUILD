@@ -8,13 +8,14 @@ pkgname=("${MINGW_PACKAGE_PREFIX}-python-${_realname}")
 provides=("${MINGW_PACKAGE_PREFIX}-python3-${_realname}")
 conflicts=("${MINGW_PACKAGE_PREFIX}-python3-${_realname}")
 replaces=("${MINGW_PACKAGE_PREFIX}-python3-${_realname}")
-pkgver=4.2.0
+pkgver=5.3.0
 pkgrel=1
 pkgdesc="Python documentation generator (mingw-w64)"
 arch=('any')
 mingw_arch=('mingw32' 'mingw64' 'ucrt64' 'clang64' 'clang32' 'clangarm64')
 license=('BSD')
 url="https://www.sphinx-doc.org/"
+options=(!strip)
 depends=("${MINGW_PACKAGE_PREFIX}-python-babel"
          "${MINGW_PACKAGE_PREFIX}-python-colorama"
          "${MINGW_PACKAGE_PREFIX}-python-docutils"
@@ -23,7 +24,6 @@ depends=("${MINGW_PACKAGE_PREFIX}-python-babel"
          "${MINGW_PACKAGE_PREFIX}-python-packaging"
          "${MINGW_PACKAGE_PREFIX}-python-pygments"
          "${MINGW_PACKAGE_PREFIX}-python-requests"
-         "${MINGW_PACKAGE_PREFIX}-python-setuptools"
          "${MINGW_PACKAGE_PREFIX}-python-snowballstemmer"
          "${MINGW_PACKAGE_PREFIX}-python-sphinx-alabaster-theme"
          "${MINGW_PACKAGE_PREFIX}-python-sphinxcontrib-applehelp"
@@ -32,43 +32,39 @@ depends=("${MINGW_PACKAGE_PREFIX}-python-babel"
          "${MINGW_PACKAGE_PREFIX}-python-sphinxcontrib-jsmath"
          "${MINGW_PACKAGE_PREFIX}-python-sphinxcontrib-qthelp"
          "${MINGW_PACKAGE_PREFIX}-python-sphinxcontrib-serializinghtml")
+makedepends=("${MINGW_PACKAGE_PREFIX}-python-build"
+             "${MINGW_PACKAGE_PREFIX}-python-installer"
+             "${MINGW_PACKAGE_PREFIX}-python-flit-core")
 optdepends=(
   "${MINGW_PACKAGE_PREFIX}-imagemagick: ext.imageconverter"
   "${MINGW_PACKAGE_PREFIX}-texlive-latex-extra: for generation of PDF documentation"
 )
 checkdepends=("${MINGW_PACKAGE_PREFIX}-python-pytest")
 source=("${_pyname}-${pkgver}.tar.gz"::"https://pypi.org/packages/source/S/${_pyname}/${_pyname}-${pkgver}.tar.gz")
-sha256sums=('94078db9184491e15bce0a56d9186e0aec95f16ac20b12d00e06d4e36f1058a6')
+sha256sums=('51026de0a9ff9fc13c05d74913ad66047e104f56a129ff73e174eb5c3ee794b5')
 
 prepare() {
-  cd ${srcdir}/${_pyname}-${pkgver}
-  # docutils
-  sed -i 's/<0.17/<0.18/' setup.py
-
-  cd ${srcdir}
-  cp -r "${_pyname}-${pkgver}" "python-build-${CARCH}"
+  rm -rf python-build-${MSYSTEM} | true
+  cp -r "${_pyname}-${pkgver}" "python-build-${MSYSTEM}"
 }
 
 build() {
-  cd "${srcdir}/python-build-${CARCH}"
-  ${MINGW_PREFIX}/bin/python setup.py build
+  cd "${srcdir}/python-build-${MSYSTEM}"
+  ${MINGW_PREFIX}/bin/python -m build --wheel --skip-dependency-check --no-isolation
 }
 
 check() {
-  cd "${srcdir}/python-build-${CARCH}"
+  cd "${srcdir}/python-build-${MSYSTEM}"
   #2 failed, 1165 passed, 21 skipped, 3 xfailed, 30 xpassed, 3 warnings
-  ${MINGW_PREFIX}/bin/py.test || warning "test failed"
+  ${MINGW_PREFIX}/bin/python -m pytest || warning "test failed"
 }
 
 package() {
-  cd "${srcdir}/python-build-${CARCH}"
-  MSYS2_ARG_CONV_EXCL="--prefix=;--install-scripts=;--install-platlib=" \
-  ${MINGW_PREFIX}/bin/python setup.py install --prefix=${MINGW_PREFIX} --root="${pkgdir}" -O1 --skip-build
+  cd "${srcdir}/python-build-${MSYSTEM}"
 
-  # fix python command in files
-  for _f in "${pkgdir}${MINGW_PREFIX}"/bin/*.py; do
-    sed -e '1 { s/^#!.*$// }' -i ${_f}
-  done
+  MSYS2_ARG_CONV_EXCL="--prefix=" \
+    ${MINGW_PREFIX}/bin/python -m installer --prefix=${MINGW_PREFIX} \
+    --destdir="${pkgdir}" dist/*.whl
 
   install -Dm644 LICENSE "${pkgdir}${MINGW_PREFIX}"/share/licenses/python-${_realname}/LICENSE
 }

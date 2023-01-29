@@ -12,13 +12,14 @@ _dir="Tk_Library_Source_Code-$_hash"
 pkgrel=1
 pkgdesc="A companion to Tcllib, for Tk related packages (mingw-w64)"
 arch=('any')
-mingw_arch=('mingw32' 'mingw64' 'ucrt64' 'clang64' 'clang32')
+mingw_arch=('mingw32' 'mingw64' 'ucrt64' 'clang64' 'clang32' 'clangarm64')
 conflicts=("${MINGW_PACKAGE_PREFIX}-${_realname}-git")
 replaces=("${MINGW_PACKAGE_PREFIX}-${_realname}-git")
 url='https://core.tcl.tk/tklib/home'
 license=('BSD')
 depends=("${MINGW_PACKAGE_PREFIX}-tk"
          "${MINGW_PACKAGE_PREFIX}-tcllib")
+makedepends=("${MINGW_PACKAGE_PREFIX}-autotools")
 source=("https://core.tcl-lang.org/tklib/tarball/$_hash/$_dir.tar.gz")
 sha256sums=('186f512358301cadf0258459cc37442b20b316e5c19207377ee6d699f44355e3')
 
